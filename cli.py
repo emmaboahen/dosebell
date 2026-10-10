@@ -12,6 +12,7 @@ def main(argv=None):
 
     messages = [{"role": "user", "content": prompt}]
     run_conversation(messages)
+    print()
     return 0
 
 
