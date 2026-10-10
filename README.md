@@ -10,6 +10,12 @@ This is a proof of concept demonstrating **agentic development** with the
 Anthropic API: a model-driven loop that reasons over user intent, decomposes
 it into tool calls, and hands the result to a real scheduling backend.
 
+## Demo
+
+A ~4-minute screen recording of the agent handling requests end to end:
+
+[Watch the demo](docs/dosebell-demo.mp4)
+
 ## How it works
 
 There's a single command — `dosebell "<request>"` — and no flags or
@@ -78,6 +84,8 @@ dosebell/
 │   ├── handlers.py    # tool implementations (pure logic)
 │   ├── schemas.py     # ToolParam definitions sent to the model
 │   └── runner.py      # dispatch + tool-result assembly
+├── docs/
+│   └── dosebell-demo.mp4   # screen recording of the agent in action
 ├── tests/             # pytest unit tests (no network)
 ├── evals/             # agent-behaviour evals (hits the real API)
 ├── conftest.py        # puts the project root on sys.path for pytest
