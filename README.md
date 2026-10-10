@@ -1,8 +1,10 @@
 # dosebell
 
 An agentic medication reminder. You tell it in plain language when to take
-your meds; the agent resolves the time, schedules the reminder, and fires a
-native desktop notification when it's time.
+your meds; the agent resolves the time and schedules the reminder through a
+real scheduling backend, which delivers a native desktop notification when the
+reminder fires (see [Notes](#notes-and-limitations) for how delivery works
+today).
 
 This is a proof of concept demonstrating **agentic development** with the
 Anthropic API: a model-driven loop that reasons over user intent, decomposes
@@ -35,8 +37,8 @@ The model runs under a system prompt (`agent.SYSTEM_PROMPT`) that keeps it
 strictly scoped to medication reminders and the date/time; off-topic requests
 are politely declined without calling any tool.
 
-When the scheduled time arrives, `dosebell` pops a modal macOS dialog via
-`osascript` plus an `afplay` chime (`notify-send` on Linux, stdout elsewhere).
+When a reminder fires, delivery pops a modal macOS dialog via `osascript`
+plus an `afplay` chime (`notify-send` on Linux, stdout elsewhere).
 A dialog is used instead of `osascript`'s `display notification` because the
 latter is attributed to Script Editor and is suppressed by default on many
 machines (it fails silently, exiting 0).
@@ -78,8 +80,11 @@ dosebell/
 │   └── runner.py      # dispatch + tool-result assembly
 ├── tests/             # pytest unit tests (no network)
 ├── evals/             # agent-behaviour evals (hits the real API)
+├── conftest.py        # puts the project root on sys.path for pytest
+├── pytest.ini         # test config
 ├── pyproject.toml     # packaging + the `dosebell` console script
-└── requirements.txt
+├── requirements.txt
+└── requirements-dev.txt
 ```
 
 The modules are deliberately layered: `llm.py` knows about the Anthropic SDK,
@@ -89,11 +94,13 @@ The modules are deliberately layered: `llm.py` knows about the Anthropic SDK,
 ## Setup
 
 ```bash
-python -m venv .venv
+python3 -m venv .venv         # use python3; macOS `python` is often Python 2
 source .venv/bin/activate
 pip install -e .
 cp .env.example .env          # then add your ANTHROPIC_API_KEY
 ```
+
+Run all commands below from the repository root.
 
 ## Usage
 
@@ -114,8 +121,8 @@ Reminder set for 2026-10-11 08:00:00: take my blood pressure meds (job id: 3f2a.
 ## Tests
 
 Unit tests cover the tool handlers, the agent loop, the tool dispatcher, the
-message helpers, and the scheduler/notification layer. They use fakes and
-monkeypatching, so they need no API key and no network:
+CLI entry point, the message helpers, and the scheduler/notification layer.
+They use fakes and monkeypatching, so they need no API key and no network:
 
 ```bash
 pip install -r requirements-dev.txt
@@ -125,8 +132,8 @@ pytest
 ## Evals
 
 The agent's *behaviour* (which tools it picks for a given prompt) is checked by
-a small eval harness. These run against the real Anthropic API, so they need a
-key and a `main.py`-style environment:
+a small eval harness. These run against the real Anthropic API, so they need an
+`ANTHROPIC_API_KEY` (e.g. in `.env`) and must be run from the repo root:
 
 ```bash
 python -m evals.run_evals            # all cases
