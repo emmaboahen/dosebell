@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dosebell"
+version = "0.1.0"
+description = "An agentic medication reminder"
+requires-python = ">=3.10"
+dependencies = [
+    "anthropic",
+    "python-dotenv",
+    "APScheduler<4",
+    "SQLAlchemy",
+]
+
+[project.scripts]
+dosebell = "cli:main"
+
+[tool.setuptools]
+py-modules = ["agent", "agent_helper", "cli", "llm", "main", "reminders"]
+packages = ["tools"]

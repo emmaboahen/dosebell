@@ -1,0 +1,4 @@
+anthropic
+python-dotenv
+APScheduler<4
+SQLAlchemy
